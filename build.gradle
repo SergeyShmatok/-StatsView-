@@ -1,7 +1,9 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.kotlin_version = "2.2.0"
-    ext.android_gradle_version = "8.11.0"
+    ext.android_gradle_version = "8.14.3"
 }
 
 plugins {
@@ -10,12 +12,14 @@ plugins {
 }
 
 subprojects {
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
-        kotlinOptions.jvmTarget = "17"
+    tasks.withType(KotlinCompile).tap {
+        configureEach {
+            kotlinOptions.jvmTarget = "17"
+        }
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register('clean', Delete) {
+    delete rootProject.layout.buildDirectory
 }
 

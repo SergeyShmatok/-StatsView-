@@ -18,7 +18,7 @@ class StatsView @JvmOverloads constructor(
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
-) : View(
+) : View (
     context,
     attributeSet,
     defStyleAttr,
