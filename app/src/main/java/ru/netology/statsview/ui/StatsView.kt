@@ -1,5 +1,6 @@
 package ru.netology.statsview.ui
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -7,6 +8,7 @@ import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.core.content.withStyledAttributes
 import ru.netology.statsview.R
 import ru.netology.statsview.util.AndroidUtils
@@ -18,7 +20,7 @@ class StatsView @JvmOverloads constructor(
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
-) : View (
+) : View(
     context,
     attributeSet,
     defStyleAttr,
@@ -28,6 +30,13 @@ class StatsView @JvmOverloads constructor(
     private var textSize = AndroidUtils.dp(context, 20F).toFloat()
     private var lineWidth = AndroidUtils.dp(context, 5F)
     private var colors = emptyList<Int>()
+
+    private var progress = 0F
+    private var progressOfRotate = 0
+    private var valueAnimator: ValueAnimator? = null
+    private var valueAnimatorRotate: ValueAnimator? = null
+    private var endOfAnimation = 0
+
 
     init {
         context.withStyledAttributes(attributeSet, R.styleable.StatsView) {
@@ -49,7 +58,7 @@ class StatsView @JvmOverloads constructor(
     var data: List<Float> = emptyList()
         set(value) {
             field = value
-            invalidate() // Вызовет onDraw. Перерисовка при установке значения?
+            update()
         }
 
     private var radius = 0F
@@ -104,24 +113,16 @@ class StatsView @JvmOverloads constructor(
         }
         var startAngle = -90F
         val dataSum = data.sum()
-        val dataCount = data.count()
-
-        println("Количество частей: $dataCount")
-
-        paint.color = colors[4]
-        canvas.drawCircle(center.x, center.y, radius, paint)
 
         data.forEachIndexed { index, item -> // отдаёт элемент и его индекс
             val pathOfData = item / fullIndicator
             val angle = pathOfData * 360
             paint.color = colors.getOrElse(index) { generateRandomColor() }
 
-            if (index != 3) {
-                canvas.drawArc(oval, startAngle, angle, false, paint)
-            } else {
-                canvas.drawArc(oval, startAngle, angle, false, paint)
-                paint.color = colors.first()
-                canvas.drawPoint(center.x + 5F, center.y - radius, paint) // решение с точкой
+            if (index != 3)
+                canvas.drawArc(oval, startAngle + progressOfRotate, angle * progress, false, paint)
+            else {
+                canvas.drawArc(oval, startAngle + progressOfRotate, angle * progress, false, paint)
             }
 
             startAngle += angle
@@ -135,8 +136,64 @@ class StatsView @JvmOverloads constructor(
             textPaint
         )
 
+        if (endOfAnimation == 1) {
+            paint.color = colors.first()
+            canvas.drawPoint(center.x + 5F, center.y - radius, paint) // решение с точкой
+        }
     }
 
-    private fun generateRandomColor() = Random.Default.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
+
+    private fun update() {
+
+        valueAnimator?.let {
+            it.removeAllListeners() // Удаляет всех "слушателей" и pauseListeners из этого объекта.
+            it.cancel() // Отменяет анимацию
+        }
+        progress = 0F
+        valueAnimator = ValueAnimator.ofFloat(0F, 1F).apply {// Создаёт и возвращает
+            // объект ValueAnimator, который выполняет анимацию между значениями с плавающей точкой.
+            addUpdateListener { anim -> // Добавляет "слушатель" в набор "слушателей", которым
+                // отправляются события обновления на протяжении всего цикла анимации.
+                progress = anim.animatedValue as Float // Последнее значение, вычисленное этим
+                // ValueAnimator для одного анимируемого свойства.
+                invalidate() // Вызовет onDraw. Перерисовка при установке значения?
+                // Каждый раз когда изменяются значения реагирует лисенер и вызовется invalidate()
+            }
+            duration = 2000
+            interpolator = LinearInterpolator()
+
+        }.also {
+            it.start()
+        }
+
+//----------------------------------------------------------------------
+
+        valueAnimatorRotate?.let {
+            it.removeAllListeners()
+            it.cancel()
+        }
+
+        progressOfRotate = 0
+        valueAnimatorRotate = ValueAnimator.ofInt(0, 60).apply {
+
+            addUpdateListener { anim ->
+                val lastValue = anim.animatedValue as Int
+                if (lastValue == 60) endOfAnimation = 1
+                progressOfRotate = lastValue * 6
+                invalidate()
+            }
+
+            duration = 2000
+            interpolator = LinearInterpolator()
+
+        }.also {
+            it.start()
+        }
+
+
+    }
+
+    private fun generateRandomColor() =
+        Random.Default.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
 
 }

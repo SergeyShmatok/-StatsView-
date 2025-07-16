@@ -11,9 +11,7 @@
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center"
-        />
-
+        android:layout_gravity="top|center" />
 
 
     <ru.netology.statsview.ui.StatsView
@@ -28,5 +26,15 @@
         app:color5="@color/gray"
         app:lineWidth="16dp"
         app:textSize="40sp" />
+
+<!--    <TextView-->
+<!--        android:id="@+id/percents"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:paddingBottom="8dp"-->
+<!--        android:text="@string/one_hundred_percent"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:textSize="40.0sp" />-->
 </FrameLayout>
 
