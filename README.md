@@ -1,2 +1,1 @@
-## *-StatsView-*
----
+## -StatsView-
