@@ -11,7 +11,7 @@
 
 **Демонстрация:**
 <p align="left">
-  <img src="Screen-video/3-gif.gif" width="300" alt="Демонстрация работы StatsView">
+  <img src="Screen-video/3-gif.gif" width="700" alt="Демонстрация работы StatsView">
 </p>
 
 Смотреть [скрины](Screen-video)
