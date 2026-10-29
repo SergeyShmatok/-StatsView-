@@ -10,6 +10,9 @@
 - Анимация поворота на 360 градусов при отрисовке (Rotation), текст остаётся неподвижным
 
 **Демонстрация:**
+<!-- <p align="center">
+  <img src="Screen-video/1.png" width="250" alt="Демонстрация работы StatsView">
+</p> -->
 <p align="left">
   <img src="Screen-video/3-gif.gif" width="700" alt="Демонстрация работы StatsView">
 </p>
