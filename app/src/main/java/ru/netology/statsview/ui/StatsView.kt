@@ -33,12 +33,10 @@ class StatsView @JvmOverloads constructor(
     private var colors = emptyList<Int>()
 
     private var progress = 0F
-
     //    private var progressOfRotate = 0
     private var valueAnimator: ValueAnimator? = null
-
     //    private var valueAnimatorRotate: ValueAnimator? = null
-    private var endOfAnimation = 0
+//    private var endOfAnimation = 0
 
     sealed class CallbackRepeatState {
         object START : CallbackRepeatState()
@@ -86,7 +84,7 @@ class StatsView @JvmOverloads constructor(
         strokeWidth = lineWidth.toFloat() // Настойка -Paint-
         style = Paint.Style.STROKE // -/-
         strokeJoin = Paint.Join.ROUND // Округление краёв при отрисовке
-        strokeCap = Paint.Cap.ROUND // -/-
+        strokeCap = Paint.Cap.BUTT // -/-
         // Будем округлять концы линий и при пересечении
     }
 
@@ -125,9 +123,9 @@ class StatsView @JvmOverloads constructor(
 
         val totalProgress = 360F * progress
 
-        val dataLastPath = data.size
+//        val dataLastPath = data.size
 
-        data.forEachIndexed { index, item -> // отдаёт элемент и его индекс
+        data.forEachIndexed { _, item -> // отдаёт элемент и его индекс
             val pathOfData = item / fullIndicator // Какая это часть от общего индикатора
 
             val angle = pathOfData * 360 // Сколько эта часть будет в градусах
@@ -135,12 +133,13 @@ class StatsView @JvmOverloads constructor(
             val progressItem = (totalProgress - (startAngle + 90F))
                 .coerceIn(0F, angle)
 
-            paint.color =
-                colors.getOrElse(index) { generateRandomColor() } // Для каждого итема свой цвет
+            paint.color = colors[2]
 
-            canvas.drawArc(oval, startAngle, progressItem, false, paint)
+//                colors.getOrElse(index) { generateRandomColor() } // Для каждого итема свой цвет
 
-            if (index == dataLastPath - 1) endOfAnimation = 1
+            if (progressItem >= angle) canvas.drawArc(oval, startAngle, angle - 4F, false, paint)
+
+//            if (index == dataLastPath - 1) endOfAnimation = 1
 
             startAngle += angle
         }
@@ -153,11 +152,11 @@ class StatsView @JvmOverloads constructor(
             textPaint
         )
 
-        if (endOfAnimation == 1) {
-            paint.color = colors.first()
-            canvas.drawPoint(center.x + 5F, center.y - radius, paint) // решение с точкой
-            endOfAnimation = 0
-        }
+//        if (endOfAnimation == 1) {
+//            paint.color = colors.first()
+//            canvas.drawPoint(center.x + 5F, center.y - radius, paint) // решение с точкой
+//            endOfAnimation = 0
+//        }
     }
 
 
@@ -177,23 +176,20 @@ class StatsView @JvmOverloads constructor(
                 invalidate() // Вызовет onDraw. Перерисовка при установке значения?
                 // Каждый раз когда изменяются значения реагирует лисенер и вызовется invalidate()
             }
-            duration = 3000
-            repeatCount = 2
+            duration = 5000
+//            repeatCount = 2
             interpolator = LinearInterpolator()
 
             addListener(object : Animator.AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
                     callbackAnimator?.let { it(CallbackRepeatState.START) }
                 }
-
                 override fun onAnimationEnd(animation: Animator) {
                     callbackAnimator?.let { it(CallbackRepeatState.END) }
                 }
-
                 override fun onAnimationRepeat(animation: Animator) {
                     callbackAnimator?.let { it(CallbackRepeatState.REPEAT) }
                 }
-
                 override fun onAnimationCancel(animation: Animator) {}
 
             })

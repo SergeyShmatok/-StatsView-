@@ -1,7 +1,12 @@
 package ru.netology.statsview.ui
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.BounceInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import ru.netology.statsview.R
@@ -30,7 +35,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_app) {
                     count++
                     text.text = getString(R.string.empty, count)
                 }
-
                 END -> text.text = getString(R.string.word_end)
             }
         }
@@ -43,7 +47,44 @@ class MainActivity : AppCompatActivity(R.layout.activity_app) {
         )
 
 
-        view.animate().start()
+        view.animate()
+            .setStartDelay(5200)
+            .setDuration(300)
+            .rotation(-360F)
+            .setInterpolator(AccelerateInterpolator())
+            .withEndAction {
+
+                val scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1f, 0.85f, 1.15f, 1f).apply {
+                    duration = 250
+                    interpolator = LinearInterpolator()
+                }
+                val scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1f, 0.85f, 1.15f, 1f).apply {
+                    duration = 250
+                    interpolator = LinearInterpolator()
+                }
+                val rotation =
+                    ObjectAnimator.ofFloat(view, "rotation", 0f, -6f, 6f, -4f, 4f, 0f).apply {
+                        duration = 250
+                        interpolator = LinearInterpolator()
+                    }
+                val shake =
+                    ObjectAnimator.ofFloat(view, "translationX", 0f, -6f, 6f, -4f, 4f, 0f).apply {
+                        duration = 250
+                        interpolator = LinearInterpolator()
+                    }
+
+                val alphaOn = ObjectAnimator.ofFloat(view, "alpha", 0.2F, 1F).apply {
+                    startDelay = 100
+                    duration = 350
+                    interpolator = BounceInterpolator()
+                }
+
+                AnimatorSet().apply {
+                    playTogether(scaleX, scaleY, rotation, shake, alphaOn)
+                    start()
+                }
+            }
+            .start()
 
     }
 
