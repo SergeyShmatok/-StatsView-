@@ -1,5 +1,6 @@
 package ru.netology.statsview.ui
 
+import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -32,11 +33,20 @@ class StatsView @JvmOverloads constructor(
     private var colors = emptyList<Int>()
 
     private var progress = 0F
-    private var progressOfRotate = 0
+
+    //    private var progressOfRotate = 0
     private var valueAnimator: ValueAnimator? = null
-    private var valueAnimatorRotate: ValueAnimator? = null
+
+    //    private var valueAnimatorRotate: ValueAnimator? = null
     private var endOfAnimation = 0
 
+    sealed class CallbackRepeatState {
+        object START : CallbackRepeatState()
+        object END : CallbackRepeatState()
+        object REPEAT : CallbackRepeatState()
+    }
+
+    var callbackAnimator: ((CallbackRepeatState) -> Unit)? = null
 
     init {
         context.withStyledAttributes(attributeSet, R.styleable.StatsView) {
@@ -80,8 +90,8 @@ class StatsView @JvmOverloads constructor(
         // Будем округлять концы линий и при пересечении
     }
 
-    private val textPaint = Paint( // Попробуем нарисовать круг
-        Paint.ANTI_ALIAS_FLAG // - Флаг отвечающий за сглаживание (так круг будет угловатым)
+    private val textPaint = Paint(
+        Paint.ANTI_ALIAS_FLAG
     ).apply {
         textSize = this@StatsView.textSize
         style = Paint.Style.FILL
@@ -112,24 +122,31 @@ class StatsView @JvmOverloads constructor(
             return
         }
         var startAngle = -90F
-        val dataSum = data.sum()
+
+        val totalProgress = 360F * progress
+
+        val dataLastPath = data.size
 
         data.forEachIndexed { index, item -> // отдаёт элемент и его индекс
-            val pathOfData = item / fullIndicator
-            val angle = pathOfData * 360
-            paint.color = colors.getOrElse(index) { generateRandomColor() }
+            val pathOfData = item / fullIndicator // Какая это часть от общего индикатора
 
-            if (index != 3)
-                canvas.drawArc(oval, startAngle + progressOfRotate, angle * progress, false, paint)
-            else {
-                canvas.drawArc(oval, startAngle + progressOfRotate, angle * progress, false, paint)
-            }
+            val angle = pathOfData * 360 // Сколько эта часть будет в градусах
+
+            val progressItem = (totalProgress - (startAngle + 90F))
+                .coerceIn(0F, angle)
+
+            paint.color =
+                colors.getOrElse(index) { generateRandomColor() } // Для каждого итема свой цвет
+
+            canvas.drawArc(oval, startAngle, progressItem, false, paint)
+
+            if (index == dataLastPath - 1) endOfAnimation = 1
 
             startAngle += angle
         }
 
         canvas.drawText(
-            "%.2f%%".format(dataSum / fullIndicator * 100.00), // "2f" оставляет два знака после запятой,
+            "%.0f%%".format(progress * 100), // "2f" оставляет два знака после запятой,
             // спецификатор %% вставляет %.
             center.x,
             center.y + textPaint.textSize / 4,
@@ -139,6 +156,7 @@ class StatsView @JvmOverloads constructor(
         if (endOfAnimation == 1) {
             paint.color = colors.first()
             canvas.drawPoint(center.x + 5F, center.y - radius, paint) // решение с точкой
+            endOfAnimation = 0
         }
     }
 
@@ -159,8 +177,26 @@ class StatsView @JvmOverloads constructor(
                 invalidate() // Вызовет onDraw. Перерисовка при установке значения?
                 // Каждый раз когда изменяются значения реагирует лисенер и вызовется invalidate()
             }
-            duration = 2000
+            duration = 3000
+            repeatCount = 2
             interpolator = LinearInterpolator()
+
+            addListener(object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) {
+                    callbackAnimator?.let { it(CallbackRepeatState.START) }
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    callbackAnimator?.let { it(CallbackRepeatState.END) }
+                }
+
+                override fun onAnimationRepeat(animation: Animator) {
+                    callbackAnimator?.let { it(CallbackRepeatState.REPEAT) }
+                }
+
+                override fun onAnimationCancel(animation: Animator) {}
+
+            })
 
         }.also {
             it.start()
@@ -168,32 +204,33 @@ class StatsView @JvmOverloads constructor(
 
 //----------------------------------------------------------------------
 
-        valueAnimatorRotate?.let {
-            it.removeAllListeners()
-            it.cancel()
-        }
-
-        progressOfRotate = 0
-        valueAnimatorRotate = ValueAnimator.ofInt(0, 60).apply {
-
-            addUpdateListener { anim ->
-                val lastValue = anim.animatedValue as Int
-                if (lastValue == 60) endOfAnimation = 1
-                progressOfRotate = lastValue * 6
-                invalidate()
-            }
-
-            duration = 2000
-            interpolator = LinearInterpolator()
-
-        }.also {
-            it.start()
-        }
+//        valueAnimatorRotate?.let {
+//            it.removeAllListeners()
+//            it.cancel()
+//        }
+//
+//        progressOfRotate = 0
+//        valueAnimatorRotate = ValueAnimator.ofInt(0, 60).apply {
+//
+//            addUpdateListener { anim ->
+//                val lastValue = anim.animatedValue as Int
+//                if (lastValue == 60) endOfAnimation = 1
+//                progressOfRotate = lastValue * 6
+//                invalidate()
+//            }
+//
+//            duration = 2000
+////            repeatCount = 3
+//            interpolator = LinearInterpolator()
+//
+//        }.also {
+//            it.start()
+//        }
 
 
     }
 
     private fun generateRandomColor() =
-        Random.Default.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
+        Random.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
 
 }

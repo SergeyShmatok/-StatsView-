@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import ru.netology.statsview.R
+import ru.netology.statsview.ui.StatsView.CallbackRepeatState.END
+import ru.netology.statsview.ui.StatsView.CallbackRepeatState.REPEAT
+import ru.netology.statsview.ui.StatsView.CallbackRepeatState.START
 
 
 class MainActivity : AppCompatActivity(R.layout.activity_app) {
@@ -12,6 +15,26 @@ class MainActivity : AppCompatActivity(R.layout.activity_app) {
         super.onCreate(savedInstanceState)
 
         val view = findViewById<StatsView>(R.id.statsView)
+
+        val text = findViewById<TextView>(R.id.label)
+        text.textSize = 25F
+        text.setPadding(0, 32, 0, 0)
+        text.setTypeface(null, Typeface.NORMAL)
+
+        var count = 0
+
+        view.callbackAnimator = { state ->
+            when (state) {
+                START -> text.text = getString(R.string.word_start)
+                REPEAT -> {
+                    count++
+                    text.text = getString(R.string.empty, count)
+                }
+
+                END -> text.text = getString(R.string.word_end)
+            }
+        }
+
         view.data = listOf(
             500F,
             500F,
@@ -19,27 +42,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_app) {
             500F,
         )
 
-        val text = findViewById<TextView>(R.id.label)
-        text.textSize = 25F
-        text.setPadding(0, 32, 0, 0)
-        text.setTypeface(null, Typeface.NORMAL)
 
-
-        view.animate().setDuration(2000)
-            .withStartAction { // короткий вариант👆
-                text.text = getString(R.string.word_start)
-            }.withEndAction { // -//-
-                text.text = getString(R.string.word_end)
-            }
-            .start()
+        view.animate().start()
 
     }
 
 }
-
-
-
-
 
 
 //        view.animate()
@@ -47,27 +55,25 @@ class MainActivity : AppCompatActivity(R.layout.activity_app) {
 //            .setInterpolator(LinearInterpolator())
 //            .setStartDelay(300)
 //            .setDuration(1700)
-////                        .setListener(object : Animator.AnimatorListener {
-////                override fun onAnimationStart(animation: Animator) {
-////                    text.text = "START"
-////                }
-////
-////                override fun onAnimationEnd(animation: Animator) {
-////                    text.text = "END"
-////                }
-////
-////                override fun onAnimationCancel(animation: Animator) {}
-////                override fun onAnimationRepeat(animation: Animator) {}
-////
-////            })
+//                        .setListener(object : Animator.AnimatorListener {
+//                override fun onAnimationStart(animation: Animator) {
+//                    text.text = "START"
+//                }
+//
+//                override fun onAnimationEnd(animation: Animator) {
+//                    text.text = "END"
+//                }
+//
+//                override fun onAnimationCancel(animation: Animator) {}
+//                override fun onAnimationRepeat(animation: Animator) {}
+//
+//            })
 //            .withStartAction { // укороченный вариант верхнего
 //                text.text = getString(R.string.word_start)
 //            }.withEndAction { // -//-
 //                text.text = getString(R.string.word_end)
 //            }
 //            .start()
-
-
 
 
 // Пример 1 android.view.animation

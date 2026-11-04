@@ -12,6 +12,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#DCDCDC</color>
+    <color name="sky_pale">#DCEEF9</color>
+    <color name="wave_aqua">#9AD9E8</color>
+    <color name="soft_blue">#A8D8F0</color>
+    <color name="blue_teal">#1E90C8</color>
+    <color name="blue_azure">#2196D4</color>
+    <color name="blue_ocean">#0F7FB5</color>
+    <color name="blue_teal_main">#1E90C8</color>
+
 
     <array name="colors">
         <item>@color/colorPrimary</item>
