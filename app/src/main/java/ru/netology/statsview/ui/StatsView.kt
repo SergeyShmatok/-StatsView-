@@ -36,7 +36,7 @@ class StatsView @JvmOverloads constructor(
     //    private var progressOfRotate = 0
     private var valueAnimator: ValueAnimator? = null
     //    private var valueAnimatorRotate: ValueAnimator? = null
-//    private var endOfAnimation = 0
+    private var endOfAnimation = 0
 
     sealed class CallbackRepeatState {
         object START : CallbackRepeatState()
@@ -84,7 +84,7 @@ class StatsView @JvmOverloads constructor(
         strokeWidth = lineWidth.toFloat() // Настойка -Paint-
         style = Paint.Style.STROKE // -/-
         strokeJoin = Paint.Join.ROUND // Округление краёв при отрисовке
-        strokeCap = Paint.Cap.BUTT // -/-
+        strokeCap = Paint.Cap.ROUND // -/-
         // Будем округлять концы линий и при пересечении
     }
 
@@ -125,7 +125,7 @@ class StatsView @JvmOverloads constructor(
 
 //        val dataLastPath = data.size
 
-        data.forEachIndexed { _, item -> // отдаёт элемент и его индекс
+        data.forEachIndexed { index, item -> // отдаёт элемент и его индекс
             val pathOfData = item / fullIndicator // Какая это часть от общего индикатора
 
             val angle = pathOfData * 360 // Сколько эта часть будет в градусах
@@ -133,11 +133,10 @@ class StatsView @JvmOverloads constructor(
             val progressItem = (totalProgress - (startAngle + 90F))
                 .coerceIn(0F, angle)
 
-            paint.color = colors[2]
+            paint.color =
+                colors.getOrElse(index) { generateRandomColor() } // Для каждого итема свой цвет
 
-//                colors.getOrElse(index) { generateRandomColor() } // Для каждого итема свой цвет
-
-            if (progressItem >= angle) canvas.drawArc(oval, startAngle, angle - 4F, false, paint)
+            if (progressItem >= angle) canvas.drawArc(oval, startAngle, angle, false, paint)
 
 //            if (index == dataLastPath - 1) endOfAnimation = 1
 
@@ -152,11 +151,11 @@ class StatsView @JvmOverloads constructor(
             textPaint
         )
 
-//        if (endOfAnimation == 1) {
-//            paint.color = colors.first()
-//            canvas.drawPoint(center.x + 5F, center.y - radius, paint) // решение с точкой
-//            endOfAnimation = 0
-//        }
+        if (totalProgress >= 360F) {
+            paint.color = colors.first()
+            canvas.drawPoint(center.x + 5F, center.y - radius, paint) // решение с точкой
+            endOfAnimation = 0
+        }
     }
 
 

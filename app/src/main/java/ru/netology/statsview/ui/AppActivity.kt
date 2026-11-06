@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_app) {
         view.animate()
             .setStartDelay(5200)
             .setDuration(300)
-            .rotation(-360F)
+            .rotation(360F)
             .setInterpolator(AccelerateInterpolator())
             .withEndAction {
 
@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_app) {
                         interpolator = LinearInterpolator()
                     }
                 val shake =
-                    ObjectAnimator.ofFloat(view, "translationX", 0f, -6f, 6f, -4f, 4f, 0f).apply {
+                    ObjectAnimator.ofFloat(view, "translationX", 0f, -12f, 12f, -8f, 8f, 0f).apply {
                         duration = 250
                         interpolator = LinearInterpolator()
                     }
