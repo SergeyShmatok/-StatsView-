@@ -18,13 +18,19 @@
 
 <details>
   <summary>Вариации</summary>
-  
+  <p align="left">
+    
+  </p>
 <img src="Screen-video/3_GIF.gif" width="700" alt="Демонстрация работы StatsView">
-</p>
-<img src="Screen-video/5_GIF.gif" width="700" alt="Демонстрация работы StatsView">
-  
 <p align="left">
-  <em>Слева — постепенное заполнение по часовой стрелке. Справа — заполнение секторами: 25% → 50% → 75% → 100%.</em>
+  <em>Постепенное заполнение по часовой стрелке.</em>
+</p>
+
+  
+<img src="Screen-video/5_GIF.gif" width="700" alt="Демонстрация работы StatsView">
+<p align="left">
+  <em>Заполнение секторами: 25% → 50% → 75% → 100%.
+  </em>
 </p>
 
 </details>
