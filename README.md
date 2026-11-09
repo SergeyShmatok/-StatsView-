@@ -27,7 +27,7 @@
 </p>
 
   
-<img src="Screen-video/5_GIF.gif" width="700" alt="Демонстрация работы StatsView">
+<img src="Screen-video/4_GIF.gif" width="700" alt="Демонстрация работы StatsView">
 <p align="left">
   <em>Заполнение секторами: 25% → 50% → 75% → 100%.
   </em>
